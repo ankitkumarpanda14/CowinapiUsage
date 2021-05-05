@@ -1,6 +1,7 @@
 import requests
 from datetime import date, datetime
 from time import time, ctime, sleep
+from win10toast import ToastNotifier
 
 minutes = 5
 
@@ -32,6 +33,7 @@ def parse_json(result):
 def call_api():
     global count
     count = 1
+    notification = ToastNotifier()
     print(ctime(time()))
     api = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=" + __district + "&date=" + __date
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -48,6 +50,7 @@ def call_api():
             result_str = ""
             if above_45:
                 for center in output:
+                    notification.show_toast(title="CoWinAPI", msg="Vaccines are available", duration=5)
                     print(center['name'])
                     print("block:" + center['block_name'])
                     print("vaccine count:" + str(center['available_capacity']))
@@ -60,6 +63,9 @@ def call_api():
                 if len(output) > 0:
                     for center in output:
                         if center['age_limit'] < 45:
+                            if count == 1:
+                                count = count + 1
+                                notification.show_toast(title="CoWinAPI", msg="Vaccines are available", duration=5)
                             print(center['name'])
                             print("block:" + center['block_name'])
                             print("vaccine count:" + str(center['available_capacity']))
